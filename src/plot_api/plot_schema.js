@@ -24,10 +24,6 @@ var polarAxisAttrs = require('../plots/polar/legacy/axis_attributes');
 
 var editTypes = require('./edit_types');
 
-var extendFlat = Lib.extendFlat;
-var extendDeepAll = Lib.extendDeepAll;
-var isPlainObject = Lib.isPlainObject;
-
 var IS_SUBPLOT_OBJ = '_isSubplotObj';
 var IS_LINKED_TO_ARRAY = '_isLinkedToArray';
 var ARRAY_ATTR_REGEXPS = '_arrayAttrRegexps';
@@ -145,7 +141,7 @@ exports.crawl = function(attrs, callback, specifiedLevel, attrString) {
 
         if(exports.isValObject(attr)) return;
 
-        if(isPlainObject(attr) && attrName !== 'impliedEdits') {
+        if(Lib.isPlainObject(attr) && attrName !== 'impliedEdits') {
             exports.crawl(attr, callback, level + 1, fullAttrString);
         }
     });
@@ -402,7 +398,7 @@ function recurseIntoValObject(valObject, parts, i) {
     // the innermost schema item we find.
     for(; i < parts.length; i++) {
         var newValObject = valObject[parts[i]];
-        if(isPlainObject(newValObject)) valObject = newValObject;
+        if(Lib.isPlainObject(newValObject)) valObject = newValObject;
         else break;
 
         if(i === parts.length - 1) break;
@@ -456,8 +452,8 @@ function getTraceAttributes(type) {
     // make 'type' the first attribute in the object
     attributes.type = null;
 
-    var copyBaseAttributes = extendDeepAll({}, baseAttributes);
-    var copyModuleAttributes = extendDeepAll({}, _module.attributes);
+    var copyBaseAttributes = Lib.extendDeepAll({}, baseAttributes);
+    var copyModuleAttributes = Lib.extendDeepAll({}, _module.attributes);
 
     // prune global-level trace attributes that are already defined in a trace
     exports.crawl(copyModuleAttributes, function(attr, attrName, attrs, level, fullAttrString) {
@@ -467,7 +463,7 @@ function getTraceAttributes(type) {
     });
 
     // base attributes (same for all trace types)
-    extendDeepAll(attributes, copyBaseAttributes);
+    Lib.extendDeepAll(attributes, copyBaseAttributes);
 
     // prune-out base attributes based on trace module categories
     if(Registry.traceIs(type, 'noOpacity')) {
@@ -486,11 +482,11 @@ function getTraceAttributes(type) {
     }
 
     // module attributes
-    extendDeepAll(attributes, copyModuleAttributes);
+    Lib.extendDeepAll(attributes, copyModuleAttributes);
 
     // subplot attributes
     if(basePlotModule.attributes) {
-        extendDeepAll(attributes, basePlotModule.attributes);
+        Lib.extendDeepAll(attributes, basePlotModule.attributes);
     }
 
     // 'type' gets overwritten by baseAttributes; reset it here
@@ -505,7 +501,7 @@ function getTraceAttributes(type) {
     if(_module.layoutAttributes) {
         var layoutAttributes = {};
 
-        extendDeepAll(layoutAttributes, _module.layoutAttributes);
+        Lib.extendDeepAll(layoutAttributes, _module.layoutAttributes);
         out.layoutAttributes = formatAttributes(layoutAttributes);
     }
 
@@ -517,7 +513,7 @@ function getLayoutAttributes() {
     var key, _module;
 
     // global layout attributes
-    extendDeepAll(layoutAttributes, baseLayoutAttributes);
+    Lib.extendDeepAll(layoutAttributes, baseLayoutAttributes);
 
     // add base plot module layout attributes
     for(key in Registry.subplotsRegistry) {
@@ -573,7 +569,7 @@ function getLayoutAttributes() {
 
 function getTransformAttributes(type) {
     var _module = Registry.transformsRegistry[type];
-    var attributes = extendDeepAll({}, _module.attributes);
+    var attributes = Lib.extendDeepAll({}, _module.attributes);
 
     // add registered components transform attributes
     Object.keys(Registry.componentsRegistry).forEach(function(k) {
@@ -633,7 +629,7 @@ function mergeValTypeAndRole(attrs) {
                 // all 'arrayOk' attrs have a corresponding 'src' attr
                 attrs[attrName + 'src'] = makeSrcAttr(attrName);
             }
-        } else if(isPlainObject(attr)) {
+        } else if(Lib.isPlainObject(attr)) {
             // all attrs container objects get role 'object'
             attr.role = 'object';
         }
@@ -665,7 +661,7 @@ function formatArrayContainers(attrs) {
 function stringify(attrs) {
     function walk(attr) {
         for(var k in attr) {
-            if(isPlainObject(attr[k])) {
+            if(Lib.isPlainObject(attr[k])) {
                 walk(attr[k]);
             } else if(Array.isArray(attr[k])) {
                 for(var i = 0; i < attr[k].length; i++) {
@@ -684,19 +680,19 @@ function stringify(attrs) {
 }
 
 function assignPolarLayoutAttrs(layoutAttributes) {
-    extendFlat(layoutAttributes, {
+    Lib.extendFlat(layoutAttributes, {
         radialaxis: polarAxisAttrs.radialaxis,
         angularaxis: polarAxisAttrs.angularaxis
     });
 
-    extendFlat(layoutAttributes, polarAxisAttrs.layout);
+    Lib.extendFlat(layoutAttributes, polarAxisAttrs.layout);
 
     return layoutAttributes;
 }
 
 function handleBasePlotModule(layoutAttributes, _module, astr) {
     var np = Lib.nestedProperty(layoutAttributes, astr);
-    var attrs = extendDeepAll({}, _module.layoutAttributes);
+    var attrs = Lib.extendDeepAll({}, _module.layoutAttributes);
 
     attrs[IS_SUBPLOT_OBJ] = true;
     np.set(attrs);
@@ -705,5 +701,5 @@ function handleBasePlotModule(layoutAttributes, _module, astr) {
 function insertAttrs(baseAttrs, newAttrs, astr) {
     var np = Lib.nestedProperty(baseAttrs, astr);
 
-    np.set(extendDeepAll(np.get() || {}, newAttrs));
+    np.set(Lib.extendDeepAll(np.get() || {}, newAttrs));
 }

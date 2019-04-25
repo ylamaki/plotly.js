@@ -10,9 +10,8 @@
 'use strict';
 
 var Lib = require('../lib');
-var isPlainObject = Lib.isPlainObject;
 var PlotSchema = require('./plot_schema');
-var Plots = require('../plots/plots');
+var supplyDefaults = require('../plots/plots').supplyDefaults;
 var plotAttributes = require('../plots/attributes');
 var Template = require('./plot_template');
 var dfltConfig = require('./plot_config').dfltConfig;
@@ -33,7 +32,7 @@ var dfltConfig = require('./plot_config').dfltConfig;
 exports.makeTemplate = function(figure) {
     figure = Lib.isPlainObject(figure) ? figure : Lib.getGraphDiv(figure);
     figure = Lib.extendDeep({_context: dfltConfig}, {data: figure.data, layout: figure.layout});
-    Plots.supplyDefaults(figure);
+    supplyDefaults(figure);
     var data = figure.data || [];
     var layout = figure.layout || {};
     // copy over a few items to help follow the schema
@@ -85,16 +84,16 @@ exports.makeTemplate = function(figure) {
      */
     delete template.layout.template;
     var oldTemplate = layout.template;
-    if(isPlainObject(oldTemplate)) {
+    if(Lib.isPlainObject(oldTemplate)) {
         var oldLayoutTemplate = oldTemplate.layout;
 
         var i, traceType, oldTypeTemplates, oldTypeLen, typeTemplates, typeLen;
 
-        if(isPlainObject(oldLayoutTemplate)) {
+        if(Lib.isPlainObject(oldLayoutTemplate)) {
             mergeTemplates(oldLayoutTemplate, template.layout);
         }
         var oldDataTemplate = oldTemplate.data;
-        if(isPlainObject(oldDataTemplate)) {
+        if(Lib.isPlainObject(oldDataTemplate)) {
             for(traceType in template.data) {
                 oldTypeTemplates = oldDataTemplate[traceType];
                 if(Array.isArray(oldTypeTemplates)) {
@@ -131,7 +130,7 @@ function mergeTemplates(oldTemplate, newTemplate) {
     var i, j;
 
     function mergeOne(oldVal, newVal, key) {
-        if(isPlainObject(newVal) && isPlainObject(oldVal)) {
+        if(Lib.isPlainObject(newVal) && Lib.isPlainObject(oldVal)) {
             mergeTemplates(oldVal, newVal);
         } else if(Array.isArray(newVal) && Array.isArray(oldVal)) {
             // Note: omitted `inclusionAttr` from arrayTemplater here,
@@ -200,7 +199,7 @@ function walkStyleKeys(parent, templateOut, getAttributeInfo, path, basePath) {
             continue;
         }
 
-        if(!attr.valType && isPlainObject(child)) {
+        if(!attr.valType && Lib.isPlainObject(child)) {
             walkStyleKeys(child, templateOut, getAttributeInfo, nextPath, nextBasePath);
         } else if(attr._isLinkedToArray && Array.isArray(child)) {
             var dfltDone = false;
@@ -208,7 +207,7 @@ function walkStyleKeys(parent, templateOut, getAttributeInfo, path, basePath) {
             var usedNames = {};
             for(var i = 0; i < child.length; i++) {
                 var item = child[i];
-                if(isPlainObject(item)) {
+                if(Lib.isPlainObject(item)) {
                     var name = item.name;
                     if(name) {
                         if(!usedNames[name]) {
@@ -291,14 +290,14 @@ exports.validateTemplate = function(figureIn, template) {
         layout: figureIn.layout
     });
     var layout = figure.layout || {};
-    if(!isPlainObject(template)) template = layout.template || {};
+    if(!Lib.isPlainObject(template)) template = layout.template || {};
     var layoutTemplate = template.layout;
     var dataTemplate = template.data;
     var errorList = [];
 
     figure.layout = layout;
     figure.layout.template = template;
-    Plots.supplyDefaults(figure);
+    supplyDefaults(figure);
 
     var fullLayout = figure._fullLayout;
     var fullData = figure._fullData;
@@ -306,7 +305,7 @@ exports.validateTemplate = function(figureIn, template) {
     var layoutPaths = {};
     function crawlLayoutForContainers(obj, paths) {
         for(var key in obj) {
-            if(key.charAt(0) !== '_' && isPlainObject(obj[key])) {
+            if(key.charAt(0) !== '_' && Lib.isPlainObject(obj[key])) {
                 var baseKey = getBaseKey(key);
                 var nextPaths = [];
                 var i;
@@ -324,7 +323,7 @@ exports.validateTemplate = function(figureIn, template) {
 
     function crawlLayoutTemplateForContainers(obj, path) {
         for(var key in obj) {
-            if(key.indexOf('defaults') === -1 && isPlainObject(obj[key])) {
+            if(key.indexOf('defaults') === -1 && Lib.isPlainObject(obj[key])) {
                 var nextPath = getNextPath(obj, key, path);
                 if(layoutPaths[nextPath]) {
                     crawlLayoutTemplateForContainers(obj[key], nextPath);
@@ -335,14 +334,14 @@ exports.validateTemplate = function(figureIn, template) {
         }
     }
 
-    if(!isPlainObject(layoutTemplate)) {
+    if(!Lib.isPlainObject(layoutTemplate)) {
         errorList.push({code: 'layout'});
     } else {
         crawlLayoutForContainers(fullLayout, ['layout']);
         crawlLayoutTemplateForContainers(layoutTemplate, 'layout');
     }
 
-    if(!isPlainObject(dataTemplate)) {
+    if(!Lib.isPlainObject(dataTemplate)) {
         errorList.push({code: 'data'});
     } else {
         var typeCount = {};
@@ -389,7 +388,7 @@ exports.validateTemplate = function(figureIn, template) {
             if(key.charAt(0) === '_') continue;
             var val = obj[key];
             var nextPath = getNextPath(obj, key, path);
-            if(isPlainObject(val)) {
+            if(Lib.isPlainObject(val)) {
                 if(Array.isArray(obj) && val._template === false && val.templateitemname) {
                     errorList.push({
                         code: 'missing',
@@ -410,7 +409,7 @@ exports.validateTemplate = function(figureIn, template) {
 
 function hasPlainObject(arr) {
     for(var i = 0; i < arr.length; i++) {
-        if(isPlainObject(arr[i])) return true;
+        if(Lib.isPlainObject(arr[i])) return true;
     }
 }
 
