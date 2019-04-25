@@ -2835,7 +2835,8 @@ plots.doCalcdata = function(gd, traces) {
 
 function sortAxisCategoriesByValue(axList, gd) {
     var sortByValue = false;
-    for(var i = 0; i < axList.length; i++) {
+    var i, j, k;
+    for(i = 0; i < axList.length; i++) {
         var ax = axList[i];
         if(ax.type !== 'category') continue;
 
@@ -2843,9 +2844,9 @@ function sortAxisCategoriesByValue(axList, gd) {
         if(ax.categoryorder === 'value ascending' ||
             ax.categoryorder === 'value descending') {
             sortByValue = true;
+
             // Store value associated with each category
             var categoriesValue = [];
-            var j;
             for(j = 0; j < ax._categories.length; j++) {
                 categoriesValue.push([ax._categories[j], 0]);
             }
@@ -2857,9 +2858,13 @@ function sortAxisCategoriesByValue(axList, gd) {
                 if(fullData.visible !== true) continue;
                 var cd = gd.calcdata[traceIndex];
                 var type = fullData.type;
-                for(var k = 0; k < cd.length; k++) {
+                for(k = 0; k < cd.length; k++) {
                     if(type === 'scatter') {
-                        categoriesValue[cd[k].x][1] += cd[k].y;
+                        if(ax._id[0] === 'x') {
+                            categoriesValue[cd[k].x][1] += cd[k].y;
+                        } else if(ax._id[0] === 'y') {
+                            categoriesValue[cd[k].y][1] += cd[k].x;
+                        }
                     } else if(type === 'histogram') {
                         categoriesValue[cd[k].p][1] += cd[k].s;
                     }
