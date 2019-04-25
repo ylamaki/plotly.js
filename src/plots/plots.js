@@ -2821,9 +2821,72 @@ plots.doCalcdata = function(gd, traces) {
 
     doCrossTraceCalc(gd);
 
+    // Sort axis categories per value if specified
+    if(sortAxisCategoriesByValue(axList, gd)) {
+        // If a sort operation was performed, run calc() again
+        for(i = 0; i < fullData.length; i++) calci(i, true);
+        for(i = 0; i < fullData.length; i++) calci(i, false);
+        doCrossTraceCalc(gd);
+    }
+
     Registry.getComponentMethod('fx', 'calc')(gd);
     Registry.getComponentMethod('errorbars', 'calc')(gd);
 };
+
+function sortAxisCategoriesByValue(axList, gd) {
+    var sortByValue = false;
+    for(var i = 0; i < axList.length; i++) {
+        var ax = axList[i];
+        if(ax.type !== 'category') continue;
+
+        // Order by value
+        if(ax.categoryorder === 'value ascending' ||
+            ax.categoryorder === 'value descending') {
+            sortByValue = true;
+            // Store value associated with each category
+            var categoriesValue = [];
+            var j;
+            for(j = 0; j < ax._categories.length; j++) {
+                categoriesValue.push([ax._categories[j], 0]);
+            }
+
+            // Aggregate values across traces
+            for(j = 0; j < ax._traceIndices.length; j++) {
+                var traceIndex = ax._traceIndices[j];
+                var fullData = gd._fullData[traceIndex];
+                if(fullData.visible !== true) continue;
+                var cd = gd.calcdata[traceIndex];
+                var type = fullData.type;
+                for(var k = 0; k < cd.length; k++) {
+                    if(type === 'scatter') {
+                        categoriesValue[cd[k].x][1] += cd[k].y;
+                    } else if(type === 'histogram') {
+                        categoriesValue[cd[k].p][1] += cd[k].s;
+                    }
+                }
+            }
+
+            // Sort by value
+            categoriesValue.sort(function(a, b) {
+                return a[1] - b[1];
+            });
+
+            // Set new category order
+            ax._initialCategories = categoriesValue.map(function(c) {
+                return c[0];
+            });
+
+            // Reverse if descending
+            if(ax.categoryorder === 'value descending') {
+                ax._initialCategories.reverse();
+            }
+
+            // Reinitialize axis
+            ax.clearCalc();
+        }
+    }
+    return sortByValue;
+}
 
 function setupAxisCategories(axList, fullData) {
     for(var i = 0; i < axList.length; i++) {

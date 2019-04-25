@@ -1,0 +1,19 @@
+{
+  "data": [{
+    "x": ["a", "b", "c", "a", "b", "d", "b", "c"],
+    "type": "histogram"
+  },
+  {
+    "x": ["d", "c", "b", "a", "e", "a", "b"],
+    "type": "histogram"
+  }],
+  "layout": {
+    "title": "xaxis.categoryorder: \"value ascending\"",
+    "height": 300,
+    "width": 400,
+    "barmode": "stack",
+    "xaxis": {
+      "categoryorder": "value ascending"
+    }
+  }
+}
