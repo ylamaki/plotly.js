@@ -817,8 +817,11 @@ module.exports = {
     categoryorder: {
         valType: 'enumerated',
         values: [
-            'trace', 'category ascending', 'category descending', 'array', 'value ascending', 'value descending'
-            /* , 'value ascending', 'value descending'*/ // value ascending / descending to be implemented later
+            'trace', 'category ascending', 'category descending', 'array',
+            'value ascending', 'value descending',
+            'min ascending', 'min descending',
+            'max ascending', 'max descending',
+            'sum ascending', 'sum descending'
         ],
         dflt: 'trace',
         role: 'info',
