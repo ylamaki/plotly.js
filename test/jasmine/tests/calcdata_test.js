@@ -882,29 +882,27 @@ describe('calculated data and points', function() {
                 return t.categories.length && t.categories.indexOf('cartesian') !== -1;
             });
 
-            var cartesianTraceNames = cartesianTraces.map(function(t) {
-                return t.type;
-            });
-
-            for(i = 0; i < cartesianTraceNames.length; i++) {
-                var type = cartesianTraceNames[i];
+            for(i = 0; i < cartesianTraces.length; i++) {
+                var type = cartesianTraces[i].type;
                 if(type === 'scattergl') continue;
                 if(type === 'carpet') continue;
                 if(type === 'contourcarpet') continue;
 
+                var data = [7, 2, 3, 7];
+                var cat = ['a', 'b', 'c', 'a'];
                 Plotly.newPlot(gd, {
                     data: [{
                         type: type,
-                        x: ['a', 'b', 'c', 'a'],
-                        a: ['a', 'b', 'c', 'a'],
-                        b: [7, 3, 2, 7],
-                        y: [7, 3, 2, 7],
-                        z: [7, 3, 2, 7],
+                        x: cat,
+                        a: cat,
+                        b: data,
+                        y: data,
+                        z: data,
                         // For OHLC
-                        open: [7, 3, 2, 7],
-                        close: [7, 3, 2, 7],
-                        high: [7, 3, 2, 7],
-                        low: [7, 3, 2, 7]
+                        open: data,
+                        close: data,
+                        high: data,
+                        low: data
                     }],
                     layout: {
                         xaxis: {
@@ -912,6 +910,9 @@ describe('calculated data and points', function() {
                             categoryorder: 'value ascending'
                         }
                     }
+                })
+                .then(function(gd) {
+                    expect(gd._fullLayout.xaxis._categories).toEqual(['b', 'c', 'a']);
                 });
             }
         });
