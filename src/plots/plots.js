@@ -2838,14 +2838,15 @@ var sortAxisCategoriesByValueRegex = /(value|sum|min|max) (ascending|descending)
 
 function sortAxisCategoriesByValue(axList, gd) {
     var sortByValue = [];
-    var i, j, k;
+    var i, j, k, l, o;
     for(i = 0; i < axList.length; i++) {
         var ax = axList[i];
         if(ax.type !== 'category') continue;
 
         // Order by value
-        var m = ax.categoryorder.match(sortAxisCategoriesByValueRegex);
-        if(m) {
+        var match = ax.categoryorder.match(sortAxisCategoriesByValueRegex);
+        if(match) {
+            console.log(ax._categories);
             // Store values associated with each category
             var categoriesValue = [];
             for(j = 0; j < ax._categories.length; j++) {
@@ -2854,7 +2855,7 @@ function sortAxisCategoriesByValue(axList, gd) {
 
             // Collect values across traces
             for(j = 0; j < ax._traceIndices.length; j++) {
-                // Keep track of traces we sort!
+                // Keep track of traces affected by this function
                 var traceIndex = ax._traceIndices[j];
                 sortByValue.push(traceIndex);
 
@@ -2866,21 +2867,40 @@ function sortAxisCategoriesByValue(axList, gd) {
 
                 var cd = gd.calcdata[traceIndex];
                 for(k = 0; k < cd.length; k++) {
-                    var cat, value;
+                    var cdi = cd[k];
+                    var cat, value, orientation;
+
                     if(ax._id[0] === 'x') {
-                        cat = cd[k].x;
-                        value = cd[k].y;
+                        cat = cdi.x;
+                        value = cdi.y;
+                        orientation = 'h';
                     } else if(ax._id[0] === 'y') {
-                        cat = cd[k].y;
-                        value = cd[k].x;
+                        cat = cdi.y;
+                        value = cdi.x;
+                        orientation = 'v';
                     }
-                    categoriesValue[cat][1].push(value);
+
+                    var twoDim = false;
+                    if(cdi.hasOwnProperty('z')) {
+                        value = cdi.z;
+                        twoDim = true;
+                    }
+
+                    if(twoDim) {
+                        for(l = 0; l < value.length; l++) {
+                            for(o = 0; o < value[l].length; o++) {
+                                categoriesValue[orientation === 'h' ? o : l][1].push(value[l][o]);
+                            }
+                        }
+                    } else {
+                        categoriesValue[cat][1].push(value);
+                    }
                 }
             }
 
             // Aggregate values
             var aggFn;
-            switch(m[1]) {
+            switch(match[1]) {
                 case 'min':
                     aggFn = Math.min;
                     break;
@@ -2906,7 +2926,7 @@ function sortAxisCategoriesByValue(axList, gd) {
             });
 
             // Reverse if descending
-            if(m[2] === 'descending') {
+            if(match[2] === 'descending') {
                 ax._initialCategories.reverse();
             }
 
