@@ -869,6 +869,52 @@ describe('calculated data and points', function() {
                 'b': 1
             });
         });
+
+        it('should order categories per value per axis', function() {
+            var schema = Plotly.PlotSchema.get();
+            var traces = Object.keys(schema.traces);
+            var tracesSchema = [];
+            var i;
+            for(i = 0; i < traces.length; i++) {
+                tracesSchema.push(schema.traces[traces[i]]);
+            }
+            var cartesianTraces = tracesSchema.filter(function(t) {
+                return t.categories.length && t.categories.indexOf('cartesian') !== -1;
+            });
+
+            var cartesianTraceNames = cartesianTraces.map(function(t) {
+                return t.type;
+            });
+
+            for(i = 0; i < cartesianTraceNames.length; i++) {
+                var type = cartesianTraceNames[i];
+                if(type === 'scattergl') continue;
+                if(type === 'carpet') continue;
+                if(type === 'contourcarpet') continue;
+
+                Plotly.newPlot(gd, {
+                    data: [{
+                        type: type,
+                        x: ['a', 'b', 'c', 'a'],
+                        a: ['a', 'b', 'c', 'a'],
+                        b: [7, 3, 2, 7],
+                        y: [7, 3, 2, 7],
+                        z: [7, 3, 2, 7],
+                        // For OHLC
+                        open: [7, 3, 2, 7],
+                        close: [7, 3, 2, 7],
+                        high: [7, 3, 2, 7],
+                        low: [7, 3, 2, 7]
+                    }],
+                    layout: {
+                        xaxis: {
+                            type: 'category',
+                            categoryorder: 'value ascending'
+                        }
+                    }
+                });
+            }
+        });
     });
 
     describe('customdata', function() {

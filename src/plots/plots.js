@@ -2846,7 +2846,6 @@ function sortAxisCategoriesByValue(axList, gd) {
         // Order by value
         var match = ax.categoryorder.match(sortAxisCategoriesByValueRegex);
         if(match) {
-            console.log(ax._categories);
             // Store values associated with each category
             var categoriesValue = [];
             for(j = 0; j < ax._categories.length; j++) {
@@ -2889,7 +2888,9 @@ function sortAxisCategoriesByValue(axList, gd) {
                     if(twoDim) {
                         for(l = 0; l < value.length; l++) {
                             for(o = 0; o < value[l].length; o++) {
-                                categoriesValue[orientation === 'h' ? o : l][1].push(value[l][o]);
+                                var catIndex = orientation === 'h' ? o : l;
+                                if(catIndex > categoriesValue.length - 1) continue;
+                                categoriesValue[catIndex][1].push(value[l][o]);
                             }
                         }
                     } else {
