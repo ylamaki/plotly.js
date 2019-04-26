@@ -2867,17 +2867,12 @@ function sortAxisCategoriesByValue(axList, gd) {
                 var cd = gd.calcdata[traceIndex];
                 for(k = 0; k < cd.length; k++) {
                     var cat, value;
-                    if(type === 'scatter') {
-                        if(ax._id[0] === 'x') {
-                            cat = cd[k].x;
-                            value = cd[k].y;
-                        } else if(ax._id[0] === 'y') {
-                            cat = cd[k].y;
-                            value = cd[k].x;
-                        }
-                    } else if(type === 'histogram') {
-                        cat = cd[k].p;
-                        value = cd[k].s;
+                    if(ax._id[0] === 'x') {
+                        cat = cd[k].x;
+                        value = cd[k].y;
+                    } else if(ax._id[0] === 'y') {
+                        cat = cd[k].y;
+                        value = cd[k].x;
                     }
                     categoriesValue[cat][1].push(value);
                 }
