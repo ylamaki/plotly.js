@@ -777,6 +777,7 @@ describe('A funnel plot', function() {
             type: 'funnel',
             text: ['1', 'Very very very very very long text'],
             textposition: 'inside',
+            insidetextrotate: 'auto',
         }];
         var layout = {};
 

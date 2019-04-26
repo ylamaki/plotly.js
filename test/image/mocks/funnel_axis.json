@@ -1,0 +1,133 @@
+{
+    "data": [
+        {
+            "type": "funnel",
+            "orientation": "v",
+            "x": [
+                "A",
+                "B",
+                "C"
+            ],
+            "y": [
+                3,
+                2,
+                1
+            ],
+            "xaxis": "x",
+            "yaxis": "y"
+        },
+        {
+            "type": "funnel",
+            "orientation": "v",
+            "x": [
+                "A",
+                "B",
+                "C"
+            ],
+            "y": [
+                3,
+                2,
+                1
+            ],
+            "xaxis": "x2",
+            "yaxis": "y2"
+        },
+        {
+            "type": "funnel",
+            "orientation": "h",
+            "x": [
+                3,
+                2,
+                1
+            ],
+            "y": [
+                "A",
+                "B",
+                "C"
+            ],
+            "xaxis": "x3",
+            "yaxis": "y3"
+        },
+        {
+            "type": "funnel",
+            "orientation": "h",
+            "x": [
+                3,
+                2,
+                1
+            ],
+            "y": [
+                "A",
+                "B",
+                "C"
+            ],
+            "xaxis": "x4",
+            "yaxis": "y4"
+        }
+    ],
+    "layout": {
+        "width": 800,
+        "height": 800,
+        "dragmode": "pan",
+        "xaxis": {
+            "type": "category",
+            "domain": [
+                0,
+                0.48
+            ],
+            "autorange": true
+        },
+        "xaxis2": {
+            "type": "category",
+            "domain": [
+                0.52,
+                1
+            ],
+            "autorange": "reversed"
+        },
+        "xaxis3": {
+            "domain": [
+                0,
+                0.48
+            ],
+            "autorange": true
+        },
+        "xaxis4": {
+            "domain": [
+                0.52,
+                1
+            ],
+            "autorange": "reversed"
+        },
+        "yaxis": {
+            "domain": [
+                0,
+                0.48
+            ],
+            "autorange": "reversed"
+        },
+        "yaxis2": {
+            "domain": [
+                0.52,
+                1
+            ],
+            "autorange": true
+        },
+        "yaxis3": {
+            "type": "category",
+            "domain": [
+                0.52,
+                1
+            ],
+            "autorange": "reversed"
+        },
+        "yaxis4": {
+            "type": "category",
+            "domain": [
+                0,
+                0.48
+            ],
+            "autorange": true
+        }
+    }
+}
